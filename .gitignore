@@ -1,2 +1,4 @@
 .env
 config.json
+cookie.txt
+parsers/__pycache__
