@@ -5,8 +5,8 @@ import json
 import validators
 
 import cheinsteinpy
-from core.utils import sendDefer
-from core.renderSteps import format_steps, write_to_template
+import re
+from jinja2 import Environment, FileSystemLoader, BaseLoader
 
 
 with open("config.json", "r") as f:
@@ -37,15 +37,27 @@ class Commands(commands.Cog):
                         title="Error", description="Something went wrong or there was no solution.", color=0xff4f4f)
                     print('No answer found!')
                 else:
+                    print("Searching....")
+                    env = Environment(loader=FileSystemLoader('templates/'))
+                    temp = env.get_template('chapterQuestion.html')
+                    results_filename = "answers.html"
+
                     total = len(answerRaw)
-                    steps = format_steps(answerRaw, total)
+                    print(f'total steps: {total}')
+                    reg = '(https?://+)'
+                    steps = {step + 1: str(re.subn('png', 'png">', str(re.sub(
+                        reg, '<img src="https://', answerRaw[step]))))[2:-5] for step in range(0, total)}
                     print(steps)
                     context = {
                         'problemTitle': questionRaw,
                         'steps': steps,
                         'totalSteps': total,
                     }
-                    write_to_template(context)
+                    with open(results_filename, mode="w", encoding="utf-8") as results:
+                        results.write(temp.render(context))
+                        print(f'... wrote {results_filename}')
+
+
                     await ctx.reply(file=discord.File('answers.html'))
 
 
