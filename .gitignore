@@ -1,6 +1,8 @@
 .env
 config.json
 cookie.txt
+answers.html
+steps.html
 parsers/__pycache__
 cogs/__pycache__
 core/__pycache__
